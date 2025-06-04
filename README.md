@@ -1,36 +1,219 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Speech to Text Service
 
-## Getting Started
+A modern web application for recording audio and converting speech to text using OpenAI's Whisper API. Built with Next.js, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## 🚀 Features
 
+### Current Features ✅
+- **Audio Recording**: Record high-quality audio directly in the browser
+- **Real-time Recording Display**: Visual feedback with timer and waveform
+- **Audio Playback**: Review recordings before transcription
+- **Responsive Design**: Beautiful UI that works on all devices
+- **Transcription History**: View and manage all your transcriptions
+- **Copy to Clipboard**: Easy copying of transcribed text
+- **OpenAI Integration**: Real speech-to-text using Whisper API
+- **Vercel Blob Storage**: Secure audio file storage
+- **Error Handling**: Comprehensive error handling and user feedback
+
+### Planned Features 🚧
+- **PostgreSQL Database**: Persist transcription history
+- **User Authentication**: Secure user accounts
+- **Export Options**: Download transcriptions in various formats
+- **Language Detection**: Auto-detect spoken language
+- **Batch Processing**: Upload and transcribe multiple files
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS 4
+- **Audio API**: Web MediaRecorder API
+- **Deployment**: Vercel (planned)
+- **Database**: PostgreSQL (planned)
+- **File Storage**: Vercel Blob (planned)
+- **AI**: OpenAI Whisper API (planned)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- OpenAI API key
+- Vercel account (for Blob storage)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd speech-to-text
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+Create a `.env.local` file in the root directory:
+```bash
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Vercel Blob Configuration  
+BLOB_READ_WRITE_TOKEN=your_vercel_blob_token_here
 
-## Learn More
+# App Configuration (optional)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Getting API Keys
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### OpenAI API Key
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Sign in or create an account
+3. Create a new API key
+4. Copy the key and add it to your `.env.local` file
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### Vercel Blob Token
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Create a new project or select an existing one
+3. Go to **Storage** tab
+4. Create a new **Blob** store
+5. Copy the **BLOB_READ_WRITE_TOKEN** and add it to your `.env.local` file
 
-## Deploy on Vercel
+4. Validate your setup (optional but recommended):
+```bash
+npm run setup-check
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Run the development server:
+```bash
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## 📝 Usage
+
+1. **Record Audio**: Click the microphone button to start recording
+2. **Stop Recording**: Click "Stop Recording" when finished
+3. **Review**: Listen to your recording using the audio player
+4. **Transcribe**: Click "Transcribe" to convert speech to text using OpenAI Whisper
+5. **Manage**: View your transcription history, copy text, or expand for full content
+6. **Storage**: Audio files are automatically saved to Vercel Blob storage
+
+## 🎯 Current Status
+
+**Phase 1: Frontend ✅ (Complete)**
+- [x] Audio recording functionality
+- [x] Real-time recording interface
+- [x] Audio playback
+- [x] Transcription history UI
+- [x] Responsive design
+- [x] Copy to clipboard
+
+**Phase 2: Backend APIs ✅ (Complete)**
+- [x] OpenAI Whisper API integration
+- [x] Vercel Blob storage setup
+- [x] File upload and management
+- [x] Transcription endpoint
+- [x] Error handling and validation
+
+**Phase 3: Database (Future)**
+- [ ] PostgreSQL setup
+- [ ] Transcription persistence
+- [ ] User management
+- [ ] Data retrieval APIs
+
+**Phase 4: Enhanced Features (Future)**
+- [ ] User authentication
+- [ ] Export functionality
+- [ ] Advanced audio processing
+- [ ] Batch transcription
+
+## 🔧 Development
+
+### Project Structure
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── transcribe/
+│   │   │   └── route.ts    # Speech-to-text API endpoint
+│   │   └── health/
+│   │       └── route.ts    # Health check endpoint
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Main application
+│   └── globals.css         # Global styles
+├── components/
+│   ├── AudioRecorder.tsx   # Recording interface
+│   └── TranscriptionHistory.tsx # History display
+├── lib/
+│   └── config.ts           # Configuration utilities
+└── scripts/
+    └── setup-check.js      # Setup validation script
+```
+
+### Scripts
+- `npm run dev`: Start development server
+- `npm run build`: Build for production
+- `npm run start`: Start production server
+- `npm run lint`: Run ESLint
+- `npm run setup-check`: Validate environment configuration
+- `npm run type-check`: Run TypeScript type checking
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### "OpenAI API key not configured" error
+- Ensure your `.env.local` file contains a valid `OPENAI_API_KEY`
+- Run `npm run setup-check` to validate your configuration
+- Check that your OpenAI account has credits available
+
+#### "Vercel Blob token not configured" error
+- Ensure your `.env.local` file contains a valid `BLOB_READ_WRITE_TOKEN`
+- Make sure the token has read/write permissions
+- Verify the Vercel Blob store is created and active
+
+#### Microphone permission denied
+- Check browser permissions for microphone access
+- Try refreshing the page and granting permissions again
+- Ensure your microphone is working in other applications
+
+#### Audio recording not working
+- Try using a different browser (Chrome/Edge recommended)
+- Check if WebRTC is supported in your browser
+- Verify your microphone is not being used by other applications
+
+### Testing Your Setup
+
+1. Run the health check: `http://localhost:3000/api/health`
+2. Use the setup validation: `npm run setup-check`
+3. Test a simple recording to verify everything works
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🔮 Roadmap
+
+- [ ] Backend API development
+- [ ] OpenAI integration
+- [ ] Database setup
+- [ ] User authentication
+- [ ] File management
+- [ ] Advanced features
+- [ ] Mobile app (future)
+
+---
+
+**Note**: This is currently a frontend-only implementation. The transcription feature shows mock data while we develop the backend integration.
