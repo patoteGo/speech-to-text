@@ -148,8 +148,8 @@ export default function TranscriptionHistory({
     <div>
       {/* Header with clear all button */}
       {transcriptions.length > 0 && (
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+          <h3 className="font-bold mb-2 sm:text-lg font-medium text-gray-900">
             Historial de Transcripciones ({transcriptions.length})
           </h3>
           <button

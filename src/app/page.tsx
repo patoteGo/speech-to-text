@@ -77,10 +77,10 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-2xl font-semibold leading-6 text-gray-600 mb-2">
               Servicio de Voz a Texto para profesores
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-500 leading-5 mt-2">
               Graba tu voz y obtén transcripciones instantáneas con OpenAI
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function Home() {
 
             {/* Transcription History */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold text-gray-800">
                   Historial
                 </h2>
