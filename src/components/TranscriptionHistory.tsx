@@ -122,7 +122,7 @@ export default function TranscriptionHistory({
   };
 
   const isConversationText = (text: string): boolean => {
-    return /persona \d+:/i.test(text);
+    return /\w+\s*:/i.test(text) && text.includes(':') && text.split(':').length > 2;
   };
 
   if (isLoading && transcriptions.length === 0) {

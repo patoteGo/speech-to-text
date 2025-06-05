@@ -7,7 +7,7 @@ interface ConversationDisplayProps {
 
 export default function ConversationDisplay({ text, className = '' }: ConversationDisplayProps) {
   // Check if the text appears to be a conversation (contains speaker labels)
-  const isConversation = /persona \d+:/i.test(text);
+  const isConversation = /\w+\s*:/i.test(text) && text.includes(':');
   
   if (!isConversation) {
     // Regular text display
@@ -23,7 +23,8 @@ export default function ConversationDisplay({ text, className = '' }: Conversati
     const lines = conversationText.split('\n').filter(line => line.trim());
     
     return lines.map((line, index) => {
-      const speakerMatch = line.match(/^(persona \d+):\s*(.*)/i);
+      // Match any speaker format: "Name:" or "Persona N:" 
+      const speakerMatch = line.match(/^([^:]+):\s*(.*)/i);
       
       if (speakerMatch) {
         const [, speaker, content] = speakerMatch;
@@ -47,14 +48,29 @@ export default function ConversationDisplay({ text, className = '' }: Conversati
 
   const conversationLines = parseConversation(text);
   
-  // Define colors for different speakers
-  const speakerColors = {
-    'persona 1': 'bg-blue-100 border-l-blue-500 text-blue-900',
-    'persona 2': 'bg-green-100 border-l-green-500 text-green-900',
-    'persona 3': 'bg-purple-100 border-l-purple-500 text-purple-900',
-    'persona 4': 'bg-orange-100 border-l-orange-500 text-orange-900',
-    'persona 5': 'bg-pink-100 border-l-pink-500 text-pink-900',
-  };
+  // Define colors for different speakers (assign dynamically based on unique speakers)
+  const uniqueSpeakers = [...new Set(conversationLines
+    .filter(line => !line.isSystemLine)
+    .map(line => line.speaker?.toLowerCase())
+  )];
+  
+  const colorClasses = [
+    'bg-blue-100 border-l-blue-500 text-blue-900',
+    'bg-green-100 border-l-green-500 text-green-900',
+    'bg-purple-100 border-l-purple-500 text-purple-900',
+    'bg-orange-100 border-l-orange-500 text-orange-900',
+    'bg-pink-100 border-l-pink-500 text-pink-900',
+    'bg-indigo-100 border-l-indigo-500 text-indigo-900',
+    'bg-teal-100 border-l-teal-500 text-teal-900',
+    'bg-rose-100 border-l-rose-500 text-rose-900',
+  ];
+  
+  const speakerColors: Record<string, string> = {};
+  uniqueSpeakers.forEach((speaker, index) => {
+    if (speaker) {
+      speakerColors[speaker] = colorClasses[index % colorClasses.length];
+    }
+  });
 
   return (
     <div className={`space-y-3 ${className}`}>
@@ -98,9 +114,14 @@ export default function ConversationDisplay({ text, className = '' }: Conversati
           <span className="text-xs font-medium text-gray-700">Resumen de conversación</span>
         </div>
         <p className="text-xs text-gray-600">
-          Se identificaron {Object.keys(speakerColors).filter(speaker => 
-            text.toLowerCase().includes(speaker)
-          ).length} personas en esta conversación.
+          Se identificaron {uniqueSpeakers.length} personas en esta conversación.
+          {uniqueSpeakers.length > 0 && (
+            <span className="block mt-1">
+              Participantes: {uniqueSpeakers.map(speaker => 
+                speaker ? speaker.charAt(0).toUpperCase() + speaker.slice(1) : ''
+              ).filter(Boolean).join(', ')}
+            </span>
+          )}
         </p>
       </div>
     </div>

@@ -22,6 +22,17 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const audioFile = formData.get('audio') as File;
     const speakerCount = formData.get('speakerCount') as string;
+    const speakerNamesJson = formData.get('speakerNames') as string;
+    
+    // Parse speaker names if provided
+    let speakerNames: string[] = [];
+    if (speakerNamesJson) {
+      try {
+        speakerNames = JSON.parse(speakerNamesJson);
+      } catch (error) {
+        console.error('Error parsing speaker names:', error);
+      }
+    }
 
     if (!audioFile) {
       return NextResponse.json(
@@ -57,6 +68,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Then use GPT to identify speakers and format the conversation
+    const speakerLabels = speakerNames.length > 0 
+      ? speakerNames.map((name, index) => `${name || `Persona ${index + 1}`}`)
+      : Array.from({ length: parseInt(speakerCount) || 2 }, (_, i) => `Persona ${i + 1}`);
+
     const speakerPrompt = `
 Please analyze this transcript and identify different speakers in the conversation. Format the output as a conversation with speaker labels.
 
@@ -65,16 +80,17 @@ Transcript: "${transcription.text}"
 Instructions:
 1. Identify distinct speakers based on context, speaking patterns, and conversation flow
 2. Format as:
-   Persona 1: [what they said]
-   Persona 2: [what they said]
-   Persona 1: [continuing conversation]
+   ${speakerLabels[0]}: [what they said]
+   ${speakerLabels[1]}: [what they said]
+   ${speakerLabels[0]}: [continuing conversation]
    etc.
 
-3. Use "Persona 1", "Persona 2", etc. as speaker labels
-4. If you detect more than ${speakerCount || '2'} speakers, use additional numbers
+3. Use these specific speaker labels: ${speakerLabels.join(', ')}
+4. If you detect more than ${speakerCount || '2'} speakers, use additional numbers like ${speakerLabels[0]}, ${speakerLabels[1]}, etc.
 5. Be consistent with speaker identification throughout
 6. Maintain the natural flow and meaning of the conversation
 7. If uncertain about speaker changes, err on the side of fewer speaker transitions
+8. IMPORTANT: Use the exact speaker names provided: ${speakerLabels.join(', ')}
 
 Please provide ONLY the formatted conversation output, no additional commentary.
     `;
@@ -142,7 +158,9 @@ Please provide ONLY the formatted conversation output, no additional commentary.
         tokens: gptTokens,
         durationMinutes,
         usdExpended: totalCost,
-        speakerCount: (diarizedText.match(/Persona \d+:/g) || []).length,
+        speakerCount: speakerLabels.filter(label => 
+          diarizedText.toLowerCase().includes(label.toLowerCase() + ':')
+        ).length,
       }
     });
 

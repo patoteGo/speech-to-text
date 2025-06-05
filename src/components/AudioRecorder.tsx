@@ -31,6 +31,7 @@ export default function AudioRecorder({
   const [isTesting, setIsTesting] = useState(false);
   const [enableSpeakerDiarization, setEnableSpeakerDiarization] = useState(false);
   const [expectedSpeakers, setExpectedSpeakers] = useState(2);
+  const [speakerNames, setSpeakerNames] = useState<string[]>(['', '']);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -158,6 +159,11 @@ export default function AudioRecorder({
       // Add speaker information if diarization is enabled
       if (enableSpeakerDiarization) {
         formData.append('speakerCount', expectedSpeakers.toString());
+        // Add speaker names if provided
+        const validNames = speakerNames.slice(0, expectedSpeakers).filter(name => name.trim());
+        if (validNames.length > 0) {
+          formData.append('speakerNames', JSON.stringify(validNames));
+        }
       }
       
       // Call the appropriate API endpoint
@@ -210,6 +216,22 @@ export default function AudioRecorder({
       setAudioUrl(null);
     }
     setRecordingTime(0);
+  };
+
+  const handleSpeakerCountChange = (count: number) => {
+    setExpectedSpeakers(count);
+    // Resize the speakerNames array to match the new count
+    const newNames = [...speakerNames];
+    while (newNames.length < count) {
+      newNames.push('');
+    }
+    setSpeakerNames(newNames.slice(0, count));
+  };
+
+  const updateSpeakerName = (index: number, name: string) => {
+    const newNames = [...speakerNames];
+    newNames[index] = name;
+    setSpeakerNames(newNames);
   };
 
   return (
@@ -314,22 +336,50 @@ export default function AudioRecorder({
             </label>
             
             {enableSpeakerDiarization && (
-              <div className="ml-6 space-y-2">
-                <label className="block text-sm text-gray-600">
-                  Número esperado de personas:
-                </label>
-                <select
-                  value={expectedSpeakers}
-                  onChange={(e) => setExpectedSpeakers(Number(e.target.value))}
-                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
-                >
-                  <option value={2}>2</option>
-                  <option value={3}>3</option>
-                  <option value={4}>4</option>
-                  <option value={5}>5</option>
-                </select>
+              <div className="ml-6 space-y-3">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Número esperado de personas:
+                  </label>
+                  <select
+                    value={expectedSpeakers}
+                    onChange={(e) => handleSpeakerCountChange(Number(e.target.value))}
+                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                  >
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                    <option value={4}>4</option>
+                    <option value={5}>5</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">
+                    Nombres de las personas (opcional):
+                  </label>
+                  <div className="space-y-2">
+                    {Array.from({ length: expectedSpeakers }, (_, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-16">
+                          Persona {index + 1}:
+                        </span>
+                        <input
+                          type="text"
+                          value={speakerNames[index] || ''}
+                          onChange={(e) => updateSpeakerName(index, e.target.value)}
+                          placeholder={`Nombre de la persona ${index + 1}`}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
                 <p className="text-xs text-gray-500">
-                  Ejemplo de formato: &quot;Persona 1: hola, ¿cómo estás? Persona 2: muy bien, gracias&quot;
+                  {speakerNames.some(name => name.trim()) 
+                    ? `Ejemplo: "${speakerNames[0] || 'Persona 1'}: hola, ¿cómo estás? ${speakerNames[1] || 'Persona 2'}: muy bien, gracias"`
+                    : 'Ejemplo de formato: "Persona 1: hola, ¿cómo estás? Persona 2: muy bien, gracias"'
+                  }
                 </p>
               </div>
             )}
@@ -363,20 +413,44 @@ export default function AudioRecorder({
             </label>
             
             {enableSpeakerDiarization && (
-              <div className="ml-6">
-                <label className="block text-sm text-gray-600 mb-1">
-                  Número de personas:
-                </label>
-                <select
-                  value={expectedSpeakers}
-                  onChange={(e) => setExpectedSpeakers(Number(e.target.value))}
-                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                >
-                  <option value={2}>2</option>
-                  <option value={3}>3</option>
-                  <option value={4}>4</option>
-                  <option value={5}>5</option>
-                </select>
+              <div className="ml-6 space-y-2">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Número de personas:
+                  </label>
+                  <select
+                    value={expectedSpeakers}
+                    onChange={(e) => handleSpeakerCountChange(Number(e.target.value))}
+                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                  >
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                    <option value={4}>4</option>
+                    <option value={5}>5</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Nombres (opcional):
+                  </label>
+                  <div className="space-y-1">
+                    {Array.from({ length: expectedSpeakers }, (_, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-12 text-right">
+                          {index + 1}:
+                        </span>
+                        <input
+                          type="text"
+                          value={speakerNames[index] || ''}
+                          onChange={(e) => updateSpeakerName(index, e.target.value)}
+                          placeholder={`Persona ${index + 1}`}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>
