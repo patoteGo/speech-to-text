@@ -283,16 +283,16 @@ export default function AudioRecorder({
             <p className="text-sm text-gray-600">
               Habla ahora para verificar que tu micrófono funciona correctamente
             </p>
-            <div className="flex justify-center gap-3">
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
               <button
                 onClick={stopMicTest}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm sm:text-base"
               >
                 Detener Prueba
               </button>
               <button
                 onClick={startRecording}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm sm:text-base"
               >
                 Comenzar Grabación
               </button>
@@ -344,7 +344,7 @@ export default function AudioRecorder({
                   <select
                     value={expectedSpeakers}
                     onChange={(e) => handleSpeakerCountChange(Number(e.target.value))}
-                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                    className="w-full sm:w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   >
                     <option value={2}>2</option>
                     <option value={3}>3</option>
@@ -359,8 +359,8 @@ export default function AudioRecorder({
                   </label>
                   <div className="space-y-2">
                     {Array.from({ length: expectedSpeakers }, (_, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 w-16">
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                        <span className="text-xs text-gray-500 sm:w-16 flex-shrink-0">
                           Persona {index + 1}:
                         </span>
                         <input
@@ -368,7 +368,7 @@ export default function AudioRecorder({
                           value={speakerNames[index] || ''}
                           onChange={(e) => updateSpeakerName(index, e.target.value)}
                           placeholder={`Nombre de la persona ${index + 1}`}
-                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500"
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                         />
                       </div>
                     ))}
@@ -405,7 +405,7 @@ export default function AudioRecorder({
                 type="checkbox"
                 checked={enableSpeakerDiarization}
                 onChange={(e) => setEnableSpeakerDiarization(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-200 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700">
                 Identificar diferentes personas
@@ -421,7 +421,7 @@ export default function AudioRecorder({
                   <select
                     value={expectedSpeakers}
                     onChange={(e) => handleSpeakerCountChange(Number(e.target.value))}
-                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    className="w-full sm:w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   >
                     <option value={2}>2</option>
                     <option value={3}>3</option>
@@ -436,8 +436,8 @@ export default function AudioRecorder({
                   </label>
                   <div className="space-y-1">
                     {Array.from({ length: expectedSpeakers }, (_, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 w-12 text-right">
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                        <span className="text-xs text-gray-500 sm:w-12 sm:text-right flex-shrink-0">
                           {index + 1}:
                         </span>
                         <input
@@ -445,7 +445,7 @@ export default function AudioRecorder({
                           value={speakerNames[index] || ''}
                           onChange={(e) => updateSpeakerName(index, e.target.value)}
                           placeholder={`Persona ${index + 1}`}
-                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-blue-500 focus:border-blue-500"
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-blue-500 focus:border-blue-500 text-gray-800 focus:text-gray-800"
                         />
                       </div>
                     ))}
@@ -455,11 +455,11 @@ export default function AudioRecorder({
             )}
           </div>
           
-          <div className="flex gap-2 justify-center">
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
             <button
               onClick={handleTranscribe}
               disabled={isLoading}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               {isLoading ? (
                 <>
@@ -467,17 +467,21 @@ export default function AudioRecorder({
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {enableSpeakerDiarization ? 'Analizando conversación...' : 'Transcribiendo...'}
+                  <span className="hidden sm:inline">{enableSpeakerDiarization ? 'Analizando conversación...' : 'Transcribiendo...'}</span>
+                  <span className="sm:hidden">{enableSpeakerDiarization ? 'Analizando...' : 'Transcribiendo...'}</span>
                 </>
               ) : (
-                enableSpeakerDiarization ? 'Analizar Conversación' : 'Transcribir'
+                <>
+                  <span className="hidden sm:inline">{enableSpeakerDiarization ? 'Analizar Conversación' : 'Transcribir'}</span>
+                  <span className="sm:hidden">{enableSpeakerDiarization ? 'Analizar' : 'Transcribir'}</span>
+                </>
               )}
             </button>
             
             <button
               onClick={discardRecording}
               disabled={isLoading}
-              className="px-6 py-2 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+              className="px-6 py-2 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white rounded-lg transition-colors text-sm sm:text-base"
             >
               Descartar
             </button>
