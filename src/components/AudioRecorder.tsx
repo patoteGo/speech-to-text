@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import AudioVisualizer from './AudioVisualizer';
 
 interface AudioRecorderProps {
   onTranscriptionComplete: (transcription: {
@@ -25,12 +26,13 @@ export default function AudioRecorder({
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isTesting, setIsTesting] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioStreamRef = useRef<MediaStream | null>(null);
 
-  const startRecording = async () => {
+  const startMicTest = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -41,6 +43,41 @@ export default function AudioRecorder({
       });
       
       audioStreamRef.current = stream;
+      setIsTesting(true);
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      alert('Error al acceder al micrófono. Por favor, asegúrate de haber otorgado permisos de micrófono.');
+    }
+  };
+
+  const stopMicTest = () => {
+    if (audioStreamRef.current) {
+      audioStreamRef.current.getTracks().forEach(track => track.stop());
+      audioStreamRef.current = null;
+    }
+    setIsTesting(false);
+  };
+
+  const startRecording = async () => {
+    try {
+      // If we're already testing, use the existing stream, otherwise get a new one
+      let stream = audioStreamRef.current;
+      
+      if (!stream) {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            sampleRate: 44100,
+          }
+        });
+        audioStreamRef.current = stream;
+      }
+      
+      // Stop testing mode if active
+      if (isTesting) {
+        setIsTesting(false);
+      }
       
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm;codecs=opus'
@@ -167,9 +204,12 @@ export default function AudioRecorder({
 
   return (
     <div className="space-y-6">
+      {/* Audio Visualizer */}
+      <AudioVisualizer stream={audioStreamRef.current} isRecording={isRecording || isTesting} />
+      
       {/* Recording Controls */}
       <div className="flex justify-center items-center">
-        {!isRecording && !audioUrl && (
+        {!isRecording && !audioUrl && !isTesting && (
           <button
             onClick={startRecording}
             disabled={isLoading}
@@ -199,7 +239,51 @@ export default function AudioRecorder({
             </button>
           </div>
         )}
+
+        {isTesting && (
+          <div className="text-center space-y-4">
+            <div className="flex justify-center items-center gap-4">
+              <div className="flex items-center text-green-600">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                <span className="font-medium">Probando micrófono...</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600">
+              Habla ahora para verificar que tu micrófono funciona correctamente
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={stopMicTest}
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              >
+                Detener Prueba
+              </button>
+              <button
+                onClick={startRecording}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+              >
+                Comenzar Grabación
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Microphone Test Button */}
+      {!isRecording && !audioUrl && !isTesting && !isLoading && (
+        <div className="text-center">
+          <button
+            onClick={startMicTest}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors flex items-center gap-2 mx-auto mb-2"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M7 4a3 3 0 716 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 715 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+            </svg>
+            Probar Micrófono Primero
+          </button>
+          <p className="text-sm text-gray-500">Recomendado para verificar que tu micrófono funciona bien</p>
+        </div>
+      )}
 
       {/* Audio Preview and Actions */}
       {audioUrl && (
