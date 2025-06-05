@@ -12,11 +12,12 @@ export async function GET() {
     };
 
     return NextResponse.json(health);
-  } catch (_error) {
+  } catch (error) {
     return NextResponse.json(
       { 
         status: 'unhealthy', 
         error: 'Service check failed',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       },
       { status: 500 }
