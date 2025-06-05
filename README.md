@@ -8,10 +8,12 @@ A modern web application for recording audio and converting speech to text using
 - **Audio Recording**: Record high-quality audio directly in the browser
 - **Real-time Recording Display**: Visual feedback with timer and waveform
 - **Audio Playback**: Review recordings before transcription
+- **Speaker Diarization**: Identify different speakers in conversations with formatted output
+- **Conversation Format**: Convert multi-speaker audio into "Person 1:", "Person 2:" format
 - **Responsive Design**: Beautiful UI that works on all devices
 - **Transcription History**: View and manage all your transcriptions
 - **Copy to Clipboard**: Easy copying of transcribed text
-- **OpenAI Integration**: Real speech-to-text using Whisper API
+- **OpenAI Integration**: Real speech-to-text using Whisper API + GPT-4 for speaker identification
 - **Vercel Blob Storage**: Secure audio file storage
 - **PostgreSQL Database**: Persistent storage with Neon + Prisma ORM
 - **Token & Cost Tracking**: Monitor usage and costs per transcription
@@ -117,12 +119,25 @@ npm run dev
 
 ## 📝 Usage
 
+### Basic Transcription
 1. **Record Audio**: Click the microphone button to start recording
 2. **Stop Recording**: Click "Stop Recording" when finished
 3. **Review**: Listen to your recording using the audio player
 4. **Transcribe**: Click "Transcribe" to convert speech to text using OpenAI Whisper
 5. **Manage**: View your transcription history, copy text, or expand for full content
 6. **Storage**: Audio files are automatically saved to Vercel Blob storage
+
+### Speaker Diarization (Conversation Mode)
+1. **Enable Conversation Mode**: Before or after recording, check "Identificar diferentes personas en la conversación"
+2. **Set Speaker Count**: Select the expected number of speakers (2-5)
+3. **Record/Transcribe**: The system will automatically identify different speakers
+4. **View Results**: Transcriptions will be formatted as:
+   ```
+   Persona 1: Hello, how are you?
+   Persona 2: I'm doing great, thanks for asking!
+   Persona 1: That's wonderful to hear.
+   ```
+5. **Enhanced Display**: Conversation transcriptions show with color-coded speakers and conversation tags
 
 ## 🎯 Current Status
 

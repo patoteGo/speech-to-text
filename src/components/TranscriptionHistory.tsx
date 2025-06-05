@@ -1,16 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import ConversationDisplay from './ConversationDisplay';
 
 interface Transcription {
   id: string;
   text: string;
+  originalText?: string;
   audioUrl: string;
   timestamp: Date;
   duration?: number;
   tokens?: number;
   durationMinutes?: number;
   usdExpended?: number;
+  speakerCount?: number;
 }
 
 interface TranscriptionHistoryProps {
@@ -118,6 +121,10 @@ export default function TranscriptionHistory({
     return text.substring(0, maxLength) + '...';
   };
 
+  const isConversationText = (text: string): boolean => {
+    return /persona \d+:/i.test(text);
+  };
+
   if (isLoading && transcriptions.length === 0) {
     return (
       <div className="flex items-center justify-center h-32">
@@ -187,9 +194,19 @@ export default function TranscriptionHistory({
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex flex-col">
-              <span className="text-xs text-gray-500">
-                {formatTimestamp(transcription.timestamp)}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">
+                  {formatTimestamp(transcription.timestamp)}
+                </span>
+                {isConversationText(transcription.text) && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
+                    </svg>
+                    Conversación
+                  </span>
+                )}
+              </div>
               {transcription.tokens && (
                 <span className="text-xs text-blue-600 font-medium">
                   {transcription.tokens} tokens
@@ -255,12 +272,13 @@ export default function TranscriptionHistory({
 
           {/* Transcription Text */}
           <div className="mb-3">
-            <p className="text-gray-800 leading-relaxed">
-              {expandedId === transcription.id 
-                ? transcription.text 
-                : truncateText(transcription.text)
-              }
-            </p>
+            {expandedId === transcription.id ? (
+              <ConversationDisplay text={transcription.text} />
+            ) : (
+              <p className="text-gray-900 leading-relaxed">
+                {truncateText(transcription.text)}
+              </p>
+            )}
           </div>
 
           {/* Audio Player */}

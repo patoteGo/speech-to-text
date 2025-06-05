@@ -71,6 +71,8 @@ export async function POST(request: NextRequest) {
         language: 'es', // Spanish language
         response_format: 'verbose_json', // Get detailed response with duration
         temperature: 0.2,
+        // Add speaker diarization parameters
+        prompt: "Identify different speakers in the conversation. Format as Speaker 1: [text], Speaker 2: [text], etc.",
       });
 
       // Calculate estimated tokens (Whisper pricing is per minute, but we can estimate)

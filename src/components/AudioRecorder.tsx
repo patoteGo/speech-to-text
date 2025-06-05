@@ -7,12 +7,14 @@ interface AudioRecorderProps {
   onTranscriptionComplete: (transcription: {
     id: string;
     text: string;
+    originalText?: string;
     audioUrl: string;
     timestamp: Date;
     duration?: number;
     tokens?: number;
     durationMinutes?: number;
     usdExpended?: number;
+    speakerCount?: number;
   }) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -27,6 +29,8 @@ export default function AudioRecorder({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isTesting, setIsTesting] = useState(false);
+  const [enableSpeakerDiarization, setEnableSpeakerDiarization] = useState(false);
+  const [expectedSpeakers, setExpectedSpeakers] = useState(2);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -151,8 +155,14 @@ export default function AudioRecorder({
       const formData = new FormData();
       formData.append('audio', audioFile);
       
-      // Call the transcription API
-      const apiResponse = await fetch('/api/transcribe', {
+      // Add speaker information if diarization is enabled
+      if (enableSpeakerDiarization) {
+        formData.append('speakerCount', expectedSpeakers.toString());
+      }
+      
+      // Call the appropriate API endpoint
+      const endpoint = enableSpeakerDiarization ? '/api/diarize' : '/api/transcribe';
+      const apiResponse = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
@@ -285,6 +295,48 @@ export default function AudioRecorder({
         </div>
       )}
 
+      {/* Speaker Diarization Options */}
+      {!isRecording && !audioUrl && !isTesting && !isLoading && (
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h3 className="text-sm font-medium text-blue-900 mb-3">Opciones de Conversación</h3>
+          
+          <div className="space-y-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={enableSpeakerDiarization}
+                onChange={(e) => setEnableSpeakerDiarization(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">
+                Identificar diferentes personas en la conversación
+              </span>
+            </label>
+            
+            {enableSpeakerDiarization && (
+              <div className="ml-6 space-y-2">
+                <label className="block text-sm text-gray-600">
+                  Número esperado de personas:
+                </label>
+                <select
+                  value={expectedSpeakers}
+                  onChange={(e) => setExpectedSpeakers(Number(e.target.value))}
+                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                >
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                </select>
+                <p className="text-xs text-gray-500">
+                  Ejemplo de formato: &quot;Persona 1: hola, ¿cómo estás? Persona 2: muy bien, gracias&quot;
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Audio Preview and Actions */}
       {audioUrl && (
         <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
@@ -294,6 +346,39 @@ export default function AudioRecorder({
               <source src={audioUrl} type="audio/webm" />
               Tu navegador no soporta el elemento de audio.
             </audio>
+          </div>
+
+          {/* Speaker Diarization Options for Existing Recording */}
+          <div className="p-3 bg-blue-50 rounded border border-blue-200">
+            <label className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                checked={enableSpeakerDiarization}
+                onChange={(e) => setEnableSpeakerDiarization(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">
+                Identificar diferentes personas
+              </span>
+            </label>
+            
+            {enableSpeakerDiarization && (
+              <div className="ml-6">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Número de personas:
+                </label>
+                <select
+                  value={expectedSpeakers}
+                  onChange={(e) => setExpectedSpeakers(Number(e.target.value))}
+                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                >
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                </select>
+              </div>
+            )}
           </div>
           
           <div className="flex gap-2 justify-center">
@@ -306,12 +391,12 @@ export default function AudioRecorder({
                 <>
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Transcribiendo...
+                  {enableSpeakerDiarization ? 'Analizando conversación...' : 'Transcribiendo...'}
                 </>
               ) : (
-                'Transcribir'
+                enableSpeakerDiarization ? 'Analizar Conversación' : 'Transcribir'
               )}
             </button>
             
