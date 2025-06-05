@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Transcription } from '@/generated/prisma';
 
 export async function GET() {
   try {
@@ -10,7 +11,7 @@ export async function GET() {
     });
 
     // Transform the data to match frontend interface
-    const formattedTranscriptions = transcriptions.map((t: any) => ({
+    const formattedTranscriptions = transcriptions.map((t: Transcription) => ({
       id: t.id,
       text: t.transcriptionText,
       audioUrl: t.audioUrl,
@@ -25,8 +26,8 @@ export async function GET() {
       success: true,
       transcriptions: formattedTranscriptions,
       total: transcriptions.length,
-      totalTokens: transcriptions.reduce((sum: number, t: any) => sum + t.tokensExpended, 0),
-      totalCost: transcriptions.reduce((sum: number, t: any) => sum + t.usdExpended, 0),
+      totalTokens: transcriptions.reduce((sum: number, t: Transcription) => sum + t.tokensExpended, 0),
+      totalCost: transcriptions.reduce((sum: number, t: Transcription) => sum + t.usdExpended, 0),
     });
 
   } catch (error) {

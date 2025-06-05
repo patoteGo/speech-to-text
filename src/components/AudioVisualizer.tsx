@@ -7,6 +7,13 @@ interface AudioVisualizerProps {
   isRecording: boolean;
 }
 
+// Extend Window interface to include webkit prefixed AudioContext
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
 export default function AudioVisualizer({ stream, isRecording }: AudioVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -32,7 +39,7 @@ export default function AudioVisualizer({ stream, isRecording }: AudioVisualizer
     }
 
     // Set up Web Audio API
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
     

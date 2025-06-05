@@ -3,29 +3,35 @@ import { useState, useEffect } from 'react';
 import AudioRecorder from '@/components/AudioRecorder';
 import TranscriptionHistory from '@/components/TranscriptionHistory';
 
+// Interface for transcription data as it appears in our frontend
+interface TranscriptionData {
+  id: string;
+  text: string;
+  audioUrl: string;
+  timestamp: Date;
+  duration?: number;
+  tokens?: number;
+  durationMinutes?: number;
+  usdExpended?: number;
+}
+
+// Interface for API response transcription data (with timestamp as string)
+interface ApiTranscriptionData {
+  id: string;
+  text: string;
+  audioUrl: string;
+  timestamp: string;
+  duration?: number;
+  tokens?: number;
+  durationMinutes?: number;
+  usdExpended?: number;
+}
+
 export default function Home() {
-  const [transcriptions, setTranscriptions] = useState<{
-    id: string;
-    text: string;
-    audioUrl: string;
-    timestamp: Date;
-    duration?: number;
-    tokens?: number;
-    durationMinutes?: number;
-    usdExpended?: number;
-  }[]>([]);
+  const [transcriptions, setTranscriptions] = useState<TranscriptionData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleTranscriptionComplete = (transcription: {
-    id: string;
-    text: string;
-    audioUrl: string;
-    timestamp: Date;
-    duration?: number;
-    tokens?: number;
-    durationMinutes?: number;
-    usdExpended?: number;
-  }) => {
+  const handleTranscriptionComplete = (transcription: TranscriptionData) => {
     setTranscriptions(prev => [transcription, ...prev]);
   };
 
@@ -46,7 +52,7 @@ export default function Home() {
         
         if (data.success && data.transcriptions) {
           // Convert timestamp strings back to Date objects
-          const transcriptionsWithDates = data.transcriptions.map((t: any) => ({
+          const transcriptionsWithDates = data.transcriptions.map((t: ApiTranscriptionData) => ({
             ...t,
             timestamp: new Date(t.timestamp)
           }));
