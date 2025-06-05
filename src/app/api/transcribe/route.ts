@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import OpenAI from 'openai';
+import { prisma } from '@/lib/prisma';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -67,19 +68,49 @@ export async function POST(request: NextRequest) {
       const transcription = await openai.audio.transcriptions.create({
         file: openaiFile,
         model: 'whisper-1',
-        language: 'en', // You can make this configurable
-        response_format: 'json',
+        language: 'es', // Spanish language
+        response_format: 'verbose_json', // Get detailed response with duration
         temperature: 0.2,
+      });
+
+      // Calculate estimated tokens (Whisper pricing is per minute, but we can estimate)
+      // OpenAI Whisper charges $0.006 per minute, roughly equivalent to token usage
+      const durationMinutes = transcription.duration ? Math.ceil(transcription.duration / 60) : 1;
+      const estimatedTokens = Math.ceil(transcription.text.length / 4); // Rough estimate: 4 chars per token
+
+      // Calculate cost in USD
+      const usdCost = durationMinutes * 0.006;
+
+      console.log('Transcription completed:', {
+        duration: transcription.duration,
+        textLength: transcription.text.length,
+        estimatedTokens,
+        usdCost
+      });
+
+      // Save to database
+      const savedTranscription = await prisma.transcription.create({
+        data: {
+          audioUrl: blob.url,
+          transcriptionText: transcription.text,
+          tokensExpended: estimatedTokens,
+          timeInSeconds: transcription.duration || 0,
+          usdExpended: usdCost,
+        }
       });
 
       // Return successful response
       return NextResponse.json({
         success: true,
         transcription: {
-          id: timestamp.toString(),
-          text: transcription.text,
-          audioUrl: blob.url,
-          timestamp: new Date().toISOString(),
+          id: savedTranscription.id,
+          text: savedTranscription.transcriptionText,
+          audioUrl: savedTranscription.audioUrl,
+          timestamp: savedTranscription.createdAt.toISOString(),
+          duration: savedTranscription.timeInSeconds,
+          tokens: savedTranscription.tokensExpended,
+          durationMinutes,
+          usdExpended: savedTranscription.usdExpended,
         }
       });
 

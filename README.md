@@ -13,24 +13,27 @@ A modern web application for recording audio and converting speech to text using
 - **Copy to Clipboard**: Easy copying of transcribed text
 - **OpenAI Integration**: Real speech-to-text using Whisper API
 - **Vercel Blob Storage**: Secure audio file storage
+- **PostgreSQL Database**: Persistent storage with Neon + Prisma ORM
+- **Token & Cost Tracking**: Monitor usage and costs per transcription
 - **Error Handling**: Comprehensive error handling and user feedback
 
 ### Planned Features 🚧
-- **PostgreSQL Database**: Persist transcription history
 - **User Authentication**: Secure user accounts
 - **Export Options**: Download transcriptions in various formats
 - **Language Detection**: Auto-detect spoken language
 - **Batch Processing**: Upload and transcribe multiple files
+- **Analytics Dashboard**: Detailed usage statistics
+- **Transcription Search**: Search through historical transcriptions
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **Styling**: Tailwind CSS 4
 - **Audio API**: Web MediaRecorder API
-- **Deployment**: Vercel (planned)
-- **Database**: PostgreSQL (planned)
-- **File Storage**: Vercel Blob (planned)
-- **AI**: OpenAI Whisper API (planned)
+- **Database**: PostgreSQL with Neon + Prisma ORM
+- **File Storage**: Vercel Blob
+- **AI**: OpenAI Whisper API
+- **Deployment**: Vercel
 
 ## 🚀 Getting Started
 
@@ -62,6 +65,9 @@ OPENAI_API_KEY=your_openai_api_key_here
 # Vercel Blob Configuration  
 BLOB_READ_WRITE_TOKEN=your_vercel_blob_token_here
 
+# Database Configuration
+POSTGRES_URL=your_neon_database_url_here
+
 # App Configuration (optional)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
@@ -81,17 +87,33 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 4. Create a new **Blob** store
 5. Copy the **BLOB_READ_WRITE_TOKEN** and add it to your `.env.local` file
 
+#### Neon Database URL
+1. Go to [Neon Console](https://console.neon.tech/)
+2. Sign in or create an account
+3. Create a new project
+4. Go to **Connection Details**
+5. Copy the **Connection String** and add it as `POSTGRES_URL` to your `.env.local` file
+
 4. Validate your setup (optional but recommended):
 ```bash
 npm run setup-check
 ```
 
-5. Run the development server:
+5. Set up the database:
+```bash
+# Generate Prisma client
+npm run db:generate
+
+# Push schema to database (creates tables)
+npm run db:push
+```
+
+6. Run the development server:
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+7. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## 📝 Usage
 
@@ -119,11 +141,12 @@ npm run dev
 - [x] Transcription endpoint
 - [x] Error handling and validation
 
-**Phase 3: Database (Future)**
-- [ ] PostgreSQL setup
-- [ ] Transcription persistence
-- [ ] User management
-- [ ] Data retrieval APIs
+**Phase 3: Database ✅ (Complete)**
+- [x] PostgreSQL setup with Neon
+- [x] Transcription persistence with Prisma ORM
+- [x] Data retrieval APIs
+- [x] Token and cost tracking
+- [x] Automatic data loading
 
 **Phase 4: Enhanced Features (Future)**
 - [ ] User authentication
@@ -161,6 +184,9 @@ src/
 - `npm run lint`: Run ESLint
 - `npm run setup-check`: Validate environment configuration
 - `npm run type-check`: Run TypeScript type checking
+- `npm run db:generate`: Generate Prisma client
+- `npm run db:push`: Push schema to database
+- `npm run db:studio`: Open Prisma Studio (database GUI)
 
 ## 🔧 Troubleshooting
 

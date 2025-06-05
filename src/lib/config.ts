@@ -6,6 +6,9 @@ export const config = {
   vercel: {
     blobToken: process.env.BLOB_READ_WRITE_TOKEN,
   },
+  database: {
+    url: process.env.POSTGRES_URL,
+  },
   app: {
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
@@ -20,6 +23,10 @@ export function validateConfig() {
   
   if (!config.vercel.blobToken) {
     missing.push('BLOB_READ_WRITE_TOKEN');
+  }
+  
+  if (!config.database.url) {
+    missing.push('POSTGRES_URL');
   }
   
   if (missing.length > 0) {

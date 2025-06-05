@@ -8,6 +8,10 @@ interface AudioRecorderProps {
     text: string;
     audioUrl: string;
     timestamp: Date;
+    duration?: number;
+    tokens?: number;
+    durationMinutes?: number;
+    usdExpended?: number;
   }) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -75,7 +79,7 @@ export default function AudioRecorder({
       
     } catch (error) {
       console.error('Error starting recording:', error);
-      alert('Error accessing microphone. Please ensure you have granted microphone permissions.');
+      alert('Error al acceder al micrófono. Por favor, asegúrate de haber otorgado permisos de micrófono.');
     }
   };
 
@@ -140,8 +144,8 @@ export default function AudioRecorder({
       
     } catch (error) {
       console.error('Error transcribing audio:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Error transcribing audio: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`Error al transcribir audio: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -191,7 +195,7 @@ export default function AudioRecorder({
               onClick={stopRecording}
               className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
             >
-              Stop Recording
+              Detener Grabación
             </button>
           </div>
         )}
@@ -201,10 +205,10 @@ export default function AudioRecorder({
       {audioUrl && (
         <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
           <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">Recording completed ({formatTime(recordingTime)})</p>
+            <p className="text-sm text-gray-600 mb-2">Grabación completada ({formatTime(recordingTime)})</p>
             <audio controls className="w-full">
               <source src={audioUrl} type="audio/webm" />
-              Your browser does not support the audio element.
+              Tu navegador no soporta el elemento de audio.
             </audio>
           </div>
           
@@ -220,10 +224,10 @@ export default function AudioRecorder({
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Transcribing...
+                  Transcribiendo...
                 </>
               ) : (
-                'Transcribe'
+                'Transcribir'
               )}
             </button>
             
@@ -232,7 +236,7 @@ export default function AudioRecorder({
               disabled={isLoading}
               className="px-6 py-2 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
             >
-              Discard
+              Descartar
             </button>
           </div>
         </div>
@@ -241,7 +245,7 @@ export default function AudioRecorder({
       {/* Instructions */}
       <div className="text-sm text-gray-600 text-center">
         {!isRecording && !audioUrl && !isLoading && (
-          <p>Click the microphone button to start recording</p>
+          <p>Haz clic en el botón del micrófono para comenzar a grabar</p>
         )}
       </div>
     </div>

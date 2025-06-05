@@ -8,13 +8,18 @@
     "start": "next start",
     "lint": "next lint",
     "setup-check": "node scripts/setup-check.js",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@prisma/client": "^6.9.0",
     "@vercel/blob": "^1.1.1",
     "dotenv": "^16.5.0",
     "next": "15.3.3",
     "openai": "^5.1.0",
+    "prisma": "^6.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

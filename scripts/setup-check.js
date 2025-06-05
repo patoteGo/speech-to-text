@@ -15,6 +15,7 @@ if (!envExists) {
   console.log(`
 OPENAI_API_KEY=your_openai_api_key_here
 BLOB_READ_WRITE_TOKEN=your_vercel_blob_token_here
+POSTGRES_URL=your_neon_database_url_here
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 `);
   process.exit(1);
@@ -39,6 +40,13 @@ const checks = [
     value: process.env.BLOB_READ_WRITE_TOKEN,
     required: true,
     description: 'Get from Vercel Dashboard > Storage > Blob'
+  },
+  {
+    name: 'Database URL',
+    key: 'POSTGRES_URL',
+    value: process.env.POSTGRES_URL,
+    required: true,
+    description: 'Get from Neon Dashboard > Connection String'
   },
   {
     name: 'App URL',

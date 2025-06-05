@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Speech to Text Service",
-  description: "Record audio and convert speech to text using OpenAI's Whisper API",
-  keywords: ["speech to text", "voice recognition", "OpenAI", "Whisper", "transcription"],
+  title: "Servicio de Voz a Texto",
+  description: "Graba audio y convierte voz a texto usando la API Whisper de OpenAI",
+  keywords: ["voz a texto", "reconocimiento de voz", "OpenAI", "Whisper", "transcripción", "español"],
 };
 
 export default function RootLayout({
